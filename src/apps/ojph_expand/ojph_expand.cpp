@@ -168,7 +168,7 @@ int main(int argc, char *argv[]) {
   char *output_filename = NULL;
   ojph::ui32 skipped_res_for_read = 0;
   ojph::ui32 skipped_res_for_recon = 0;
-  bool resilient = false;
+  bool resilient = true;
 
   if (argc <= 1) {
     std::cout <<
