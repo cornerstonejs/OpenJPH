@@ -471,7 +471,9 @@ namespace ojph {
         converter = gen_cvrt_32b3c_to_16ub3c_be;
     }
 
-#ifndef OJPH_DISABLE_INTEL_SIMD
+#if !defined(OJPH_DISABLE_INTEL_SIMD) && \
+    (defined(__i386__) || defined(__x86_64__) || \
+     defined(_M_IX86) || defined(_M_X64))
 
     if (get_cpu_ext_level() >= X86_CPU_EXT_LEVEL_SSE41) {
       if (bytes_per_sample == 1) {
@@ -503,7 +505,7 @@ namespace ojph {
       }
     }
 
-#endif
+#endif // x86 SIMD
   }
 
   ////////////////////////////////////////////////////////////////////////////
