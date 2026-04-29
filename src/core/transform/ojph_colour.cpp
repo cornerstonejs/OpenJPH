@@ -106,7 +106,9 @@ namespace ojph {
       ict_forward = gen_ict_forward;
       ict_backward = gen_ict_backward;
 
-#ifndef OJPH_DISABLE_INTEL_SIMD
+#if !defined(OJPH_DISABLE_INTEL_SIMD) && \
+    (defined(__i386__) || defined(__x86_64__) || \
+     defined(_M_IX86) || defined(_M_X64))
       int level = get_cpu_ext_level();
 
       if (level >= X86_CPU_EXT_LEVEL_SSE)
@@ -144,7 +146,7 @@ namespace ojph {
         rct_forward = avx2_rct_forward;
         rct_backward = avx2_rct_backward;
       }
-#endif // !OJPH_DISABLE_INTEL_SIMD
+#endif // x86 SIMD
 
 #else // OJPH_ENABLE_WASM_SIMD
       cnvrt_si32_to_si32_shftd = wasm_cnvrt_si32_to_si32_shftd;
