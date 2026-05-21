@@ -124,7 +124,9 @@ namespace ojph {
       }
       encode_cb = ojph_encode_codeblock;
 
-#ifndef OJPH_DISABLE_INTEL_SIMD
+#if !defined(OJPH_DISABLE_INTEL_SIMD) && \
+    (defined(__i386__) || defined(__x86_64__) || \
+     defined(_M_IX86) || defined(_M_X64))
 
       // Accelerated functions for INTEL/AMD CPUs
       if (get_cpu_ext_level() >= X86_CPU_EXT_LEVEL_SSE)
@@ -166,7 +168,7 @@ namespace ojph {
         encode_cb = ojph_encode_codeblock_avx512;
 #endif // !OJPH_ENABLE_INTEL_AVX512
 
-#endif // !OJPH_DISABLE_INTEL_SIMD
+#endif // x86 SIMD
 
 #else // OJPH_ENABLE_WASM_SIMD
 

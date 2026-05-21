@@ -41,7 +41,9 @@
 
 namespace ojph {
 
-#ifndef OJPH_DISABLE_INTEL_SIMD
+#if !defined(OJPH_DISABLE_INTEL_SIMD) && \
+    (defined(__i386__) || defined(__x86_64__) || \
+     defined(_M_IX86) || defined(_M_X64))
 
   ////////////////////////////////////////////////////////////////////////////
   // This snippet is borrowed from Intel; see for example

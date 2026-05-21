@@ -127,7 +127,9 @@ namespace ojph {
       irrev_horz_wvlt_fwd_tx    = gen_irrev_horz_wvlt_fwd_tx;
       irrev_horz_wvlt_bwd_tx    = gen_irrev_horz_wvlt_bwd_tx;
 
-#ifndef OJPH_DISABLE_INTEL_SIMD
+#if !defined(OJPH_DISABLE_INTEL_SIMD) && \
+    (defined(__i386__) || defined(__x86_64__) || \
+     defined(_M_IX86) || defined(_M_X64))
       int level = get_cpu_ext_level();
 
       if (level >= X86_CPU_EXT_LEVEL_SSE)
@@ -165,7 +167,7 @@ namespace ojph {
         rev_vert_wvlt_bwd_update  = avx2_rev_vert_wvlt_bwd_update;
         rev_horz_wvlt_bwd_tx      = avx2_rev_horz_wvlt_bwd_tx;
       }
-#endif // !OJPH_DISABLE_INTEL_SIMD
+#endif // x86 SIMD
 
 #else // OJPH_ENABLE_WASM_SIMD
       rev_vert_wvlt_fwd_predict = wasm_rev_vert_wvlt_fwd_predict;
