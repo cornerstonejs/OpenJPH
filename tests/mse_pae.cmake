@@ -11,18 +11,22 @@ set(mse_pae mse_pae.cpp "../src/apps/others/ojph_img_io.cpp" "../src/core/others
 set(OJPH_IMG_IO_SSE41 "../src/apps/others/ojph_img_io_sse41.cpp")
 set(OJPH_IMG_IO_AVX2 "../src/apps/others/ojph_img_io_avx2.cpp")
 
-# if SIMD are not disabled
-if(NOT OJPH_DISABLE_INTEL_SIMD)
+# x86-only SIMD sources (match top-level CMakeLists.txt)
+if(NOT OJPH_DISABLE_INTEL_SIMD AND OJPH_X86_ARCH)
   list(APPEND mse_pae ${OJPH_IMG_IO_SSE41})
   list(APPEND mse_pae ${OJPH_IMG_IO_AVX2})
 endif()
 
 # Set compilation flags
 if (MSVC)
-  set_source_files_properties(../src/apps/others/ojph_img_io_avx2.cpp PROPERTIES COMPILE_FLAGS "/arch:AVX2")
+  if (OJPH_X86_ARCH)
+    set_source_files_properties(../src/apps/others/ojph_img_io_avx2.cpp PROPERTIES COMPILE_FLAGS "/arch:AVX2")
+  endif()
 else()
-  set_source_files_properties(../src/apps/others/ojph_img_io_sse41.cpp PROPERTIES COMPILE_FLAGS -msse4.1)
-  set_source_files_properties(../src/apps/others/ojph_img_io_avx2.cpp PROPERTIES COMPILE_FLAGS -mavx2)
+  if (OJPH_X86_ARCH)
+    set_source_files_properties(../src/apps/others/ojph_img_io_sse41.cpp PROPERTIES COMPILE_FLAGS -msse4.1)
+    set_source_files_properties(../src/apps/others/ojph_img_io_avx2.cpp PROPERTIES COMPILE_FLAGS -mavx2)
+  endif()
 endif()
 
 # Add executable
