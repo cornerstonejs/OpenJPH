@@ -2,21 +2,21 @@
 // This software is released under the 2-Clause BSD license, included
 // below.
 //
-// Copyright (c) 2019, Aous Naman 
+// Copyright (c) 2019, Aous Naman
 // Copyright (c) 2019, Kakadu Software Pty Ltd, Australia
 // Copyright (c) 2019, The University of New South Wales, Australia
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
 // met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright
 // notice, this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright
 // notice, this list of conditions and the following disclaimer in the
 // documentation and/or other materials provided with the distribution.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
 // IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
 // TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -40,13 +40,14 @@
 #define OJPH_CODESTREAM_LOCAL_H
 
 #include "ojph_defs.h"
+#include "ojph_arch.h"
 #include "ojph_params_local.h"
 
 namespace ojph {
 
   ////////////////////////////////////////////////////////////////////////////
   //defined elsewhere
-  struct line_buf;
+  class line_buf;
   class mem_fixed_allocator;
   class mem_elastic_allocator;
   class codestream;
@@ -54,11 +55,6 @@ namespace ojph {
   namespace local {
 
     /////////////////////////////////////////////////////////////////////////
-    static inline
-    ui16 swap_byte(ui16 t)
-    {
-      return (ui16)((t << 8) | (t >> 8));
-    }
 
     //////////////////////////////////////////////////////////////////////////
     //defined elsewhere
@@ -68,30 +64,32 @@ namespace ojph {
     class codestream
     {
       friend ::ojph::codestream;
-      
+
     public:
       codestream();
       ~codestream();
 
+      void restart();
+
       void pre_alloc();
       void finalize_alloc();
 
-      ojph::param_siz access_siz()            //return externally wrapped siz
+      ojph::param_siz access_siz()            // returns externally wrapped siz
       { return ojph::param_siz(&siz); }
-      const param_siz* get_siz() //return internal siz
+      const param_siz* get_siz()              // returns internal siz
       { return &siz; }
-      ojph::param_cod access_cod()            //return externally wrapped cod
+      ojph::param_cod access_cod()            // returns externally wrapped cod
       { return ojph::param_cod(&cod); }
-      const param_cod* get_cod() //return internal code
+      const param_cod* get_cod()              // returns internal cod
       { return &cod; }
-      param_qcd* access_qcd(ui32 comp_num)
-      { 
-        if (used_qcc_fields > 0)
-          for (int v = 0; v < used_qcc_fields; ++v)
-            if (qcc[v].get_comp_num() == comp_num)
-              return qcc + v;
-        return &qcd; 
-      }
+      const param_cod* get_coc(ui32 comp_num) // returns internal cod
+      { return cod.get_coc(comp_num); }
+      const param_qcd* access_qcd()
+      { return &qcd; }
+      const param_dfs* access_dfs()
+      { if (dfs.exists()) return &dfs; else return NULL; }
+      const param_nlt* get_nlt()
+      { return &nlt; }
       mem_fixed_allocator* get_allocator() { return allocator; }
       mem_elastic_allocator* get_elastic_alloc() { return elastic_alloc; }
       outfile_base* get_file() { return outfile; }
@@ -148,20 +146,20 @@ namespace ojph {
       bool employ_color_transform;
       int planar;
       int profile;
-      ui32 tilepart_div;    // tilepart division value
-      bool need_tlm;       // true if tlm markers are needed
-      
-    private:
-      param_siz siz;
-      param_cod cod;
-      param_cap cap;
-      param_qcd qcd;
-      param_tlm tlm;
+      ui32 tilepart_div;     // tilepart division value
+      bool need_tlm;         // true if tlm markers are needed
 
-    private: // this is to handle qcc
-      int used_qcc_fields;
-      param_qcc qcc_store[4], *qcc; // we allocate 4, 
-                                    // if not enough, we allocate more
+    private:
+      param_siz siz;         // image and tile size
+      param_cod cod;         // coding style default
+      param_cap cap;         // extended capabilities
+      param_qcd qcd;         // quantization default
+      param_tlm tlm;         // tile-part lengths
+      param_nlt nlt;         // non-linearity point transformation
+
+    private:  // these are from Part 2 of the standard
+      param_dfs dfs;         // downsmapling factor styles
+      param_atk atk;         // wavelet structure and coefficients
 
     private:
       mem_fixed_allocator *allocator;

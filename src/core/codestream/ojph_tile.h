@@ -47,7 +47,7 @@ namespace ojph {
 
   ////////////////////////////////////////////////////////////////////////////
   //defined elsewhere
-  struct line_buf;
+  class line_buf;
   class codestream;
 
   namespace local {
@@ -63,8 +63,7 @@ namespace ojph {
       static void pre_alloc(codestream *codestream, const rect& tile_rect,
                             const rect& recon_tile_rect, ui32 &num_tileparts);
       void finalize_alloc(codestream *codestream, const rect& tile_rect,
-                          const rect& recon_tile_rect, ui32 tile_idx, 
-                          ui32 offset, ui32 &num_tileparts);
+                          ui32 tile_idx, ui32& offset, ui32 &num_tileparts);
 
       bool push(line_buf *line, ui32 comp_num);
       void prepare_for_flush();
@@ -77,12 +76,13 @@ namespace ojph {
 
     private:
       //codestream *parent;
-      rect tile_rect, recon_tile_rect;
+      rect tile_rect;
       ui32 num_comps;
       tile_comp *comps;
       ui32 num_lines;
       line_buf* lines;
-      bool reversible, employ_color_transform, resilient;
+      bool employ_color_transform, resilient;
+      bool *reversible;
       rect *comp_rects, *recon_comp_rects;
       ui32 *line_offsets;
       ui32 skipped_res_for_read;
@@ -90,6 +90,7 @@ namespace ojph {
       ui32 *num_bits;
       bool *is_signed;
       ui32 *cur_line;
+      ui8 *nlt_type3;
       int prog_order;
 
     private:
